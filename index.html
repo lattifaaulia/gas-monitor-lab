@@ -322,8 +322,30 @@ function parseCSV(txt){
   });
 }
 
+let lastDataTime = null;
+
 async function fetchSheet(){
-  try{const res=await fetch(SHEET_URL+'&t='+Date.now());processRows(parseCSV(await res.text()));}
+  try{
+    const res=await fetch(SHEET_URL+'&t='+Date.now());
+    const rows=parseCSV(await res.text());
+    if(rows.length>1){
+      const lastRow=rows[rows.length-1];
+      const lastTs=rows[rows.length-1][0];
+      const now=new Date();
+      
+      if(lastDataTime===null) lastDataTime=now;
+      
+      const msSinceLast=now-lastDataTime;
+      if(msSinceLast > 180000){
+        document.getElementById('sysStatus').textContent='Alat Offline';
+        document.getElementById('pill').style.cssText='display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;background:#F5F5F5;color:#999;border:1.5px solid rgba(0,0,0,0.1)';
+        document.getElementById('dot').style.background='#999';
+        return;
+      }
+      processRows(rows);
+      lastDataTime=now;
+    }
+  }
   catch(e){document.getElementById('sysStatus').textContent='Gagal Terhubung';}
 }
 
