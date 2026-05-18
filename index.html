@@ -3,68 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistem Pemantauan Gas — Lab Fisika UI</title>
+<title>Sistem Pemantauan Gas — Laboratorium Fisika UI</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   :root {
-    --bg:       #FFFBEC;
-    --surface:  #FFFFFF;
-    --surface2: #FFF8DC;
-    --border:   rgba(0,0,0,0.07);
-    --text:     #3a3530;
-    --muted:    #9a8f80;
-    --radius:   14px;
-    --font:     'Segoe UI', system-ui, sans-serif;
-
-    --co:       #FF9BAB; --co-bg:   #FFF0F2; --co-fill:   rgba(255,155,171,0.18);
-    --h2:       #7BBFFF; --h2-bg:   #EEF6FF; --h2-fill:   rgba(123,191,255,0.18);
-    --alc:      #FFB87A; --alc-bg:  #FFF4E8; --alc-fill:  rgba(255,184,122,0.18);
-    --co2:      #72D49B; --co2-bg:  #EDFAF3; --co2-fill:  rgba(114,212,155,0.18);
-    --tmp:      #C89FFF; --tmp-bg:  #F5EEFF; --tmp-fill:  rgba(200,159,255,0.18);
-    --rh:       #5FD4E8; --rh-bg:   #EAFBFE; --rh-fill:   rgba(95,212,232,0.18);
-
-    --safe:     #4CAF7D;
-    --warn:     #E8A040;
-    --danger:   #E05060;
+    --bg:#FFFBEC; --surface:#FFFFFF; --surface2:#FFF8DC;
+    --border:rgba(0,0,0,0.07); --text:#3a3530; --muted:#9a8f80;
+    --radius:14px; --font:'Segoe UI',system-ui,sans-serif;
+    --co:#FF9BAB; --co-bg:#FFF0F2; --co-fill:rgba(255,155,171,0.18);
+    --h2:#7BBFFF; --h2-bg:#EEF6FF; --h2-fill:rgba(123,191,255,0.18);
+    --alc:#FFB87A; --alc-bg:#FFF4E8; --alc-fill:rgba(255,184,122,0.18);
+    --co2:#72D49B; --co2-bg:#EDFAF3; --co2-fill:rgba(114,212,155,0.18);
+    --tmp:#C89FFF; --tmp-bg:#F5EEFF; --tmp-fill:rgba(200,159,255,0.18);
+    --rh:#5FD4E8; --rh-bg:#EAFBFE; --rh-fill:rgba(95,212,232,0.18);
+    --safe:#4CAF7D; --warn:#E8A040; --danger:#E05060;
   }
-
   body { font-family:var(--font); background:var(--bg); color:var(--text); min-height:100vh; }
 
-  header {
-    background:var(--surface);
-    border-bottom:1.5px solid var(--border);
-    padding:16px 32px;
-    display:flex; align-items:center; justify-content:space-between;
-    position:sticky; top:0; z-index:100;
-  }
+  header { background:var(--surface); border-bottom:1.5px solid var(--border); padding:16px 32px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
   .hl { display:flex; align-items:center; gap:14px; }
   .logo { width:38px; height:38px; border-radius:10px; background:linear-gradient(135deg,#FFD9A0,#FFB3C1); display:flex; align-items:center; justify-content:center; font-size:20px; }
   .htitle h1 { font-size:15px; font-weight:700; color:var(--text); }
   .htitle p  { font-size:12px; color:var(--muted); margin-top:1px; }
   .hr { display:flex; align-items:center; gap:14px; }
-
   .pill { display:flex; align-items:center; gap:6px; padding:7px 14px; border-radius:20px; font-size:12px; font-weight:600; background:#EDFAF3; color:var(--safe); border:1.5px solid rgba(76,175,125,0.3); transition:all .3s; }
   .dot  { width:7px; height:7px; border-radius:50%; background:var(--safe); animation:pulse 2s infinite; }
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
   .lupd { font-size:12px; color:var(--muted); }
 
-  .banner { background:#FFF8DC; border:1.5px solid rgba(255,184,0,0.25); border-radius:var(--radius); padding:14px 20px; margin:24px 32px 0; display:flex; align-items:flex-start; gap:12px; font-size:13px; line-height:1.65; color:#8a6d00; }
-  .banner code { background:rgba(255,184,0,0.15); padding:1px 6px; border-radius:4px; font-family:monospace; font-size:12px; color:#7a5d00; }
-
   main { padding:24px 32px 48px; max-width:1400px; margin:0 auto; }
   .slabel { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:var(--muted); margin-bottom:14px; }
 
   .sgrid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; margin-bottom:32px; }
-
   .scard { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); padding:18px; position:relative; overflow:hidden; transition:all .3s; }
   .scard::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; border-radius:var(--radius) var(--radius) 0 0; }
-  .scard.co::before  { background:var(--co); }  .scard.co  { background:var(--co-bg); }
-  .scard.h2::before  { background:var(--h2); }  .scard.h2  { background:var(--h2-bg); }
-  .scard.alc::before { background:var(--alc); } .scard.alc { background:var(--alc-bg); }
-  .scard.co2::before { background:var(--co2); } .scard.co2 { background:var(--co2-bg); }
-  .scard.tmp::before { background:var(--tmp); } .scard.tmp { background:var(--tmp-bg); }
-  .scard.rh::before  { background:var(--rh); }  .scard.rh  { background:var(--rh-bg); }
+  .scard.co::before  {background:var(--co);}  .scard.co  {background:var(--co-bg);}
+  .scard.h2::before  {background:var(--h2);}  .scard.h2  {background:var(--h2-bg);}
+  .scard.alc::before {background:var(--alc);} .scard.alc {background:var(--alc-bg);}
+  .scard.co2::before {background:var(--co2);} .scard.co2 {background:var(--co2-bg);}
+  .scard.tmp::before {background:var(--tmp);} .scard.tmp {background:var(--tmp-bg);}
+  .scard.rh::before  {background:var(--rh);}  .scard.rh  {background:var(--rh-bg);}
   .scard.alarm   { border-color:rgba(224,80,96,.35); background:#FFF2F3; }
   .scard.warning { border-color:rgba(232,160,64,.35); background:#FFF8EE; }
 
@@ -73,7 +52,6 @@
   .sbadge { font-size:10px; font-weight:700; padding:3px 9px; border-radius:10px; background:#EDFAF3; color:var(--safe); white-space:nowrap; }
   .sbadge.alarm   { background:#FFF0F1; color:var(--danger); }
   .sbadge.warning { background:#FFF5E8; color:var(--warn); }
-
   .sval  { font-size:32px; font-weight:700; line-height:1; margin-bottom:4px; letter-spacing:-.5px; }
   .sunit { font-size:12px; color:var(--muted); margin-bottom:12px; }
   .tbar  { height:5px; background:rgba(0,0,0,0.07); border-radius:3px; overflow:hidden; }
@@ -82,20 +60,19 @@
 
   .crow4 { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:14px; }
   .crow1 { display:grid; grid-template-columns:1fr; margin-bottom:14px; }
-  @media(max-width:1100px){ .crow4{grid-template-columns:repeat(2,1fr);} }
-  @media(max-width:650px) { .crow4{grid-template-columns:1fr;} }
+  @media(max-width:1100px){.crow4{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:650px) {.crow4{grid-template-columns:1fr;}}
 
   .ccard { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); padding:18px; position:relative; overflow:hidden; }
   .ccard::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:var(--radius) var(--radius) 0 0; }
-  .ccard.co::before  { background:var(--co); }  .ccard.co  { background:var(--co-bg); }
-  .ccard.h2::before  { background:var(--h2); }  .ccard.h2  { background:var(--h2-bg); }
-  .ccard.alc::before { background:var(--alc); } .ccard.alc { background:var(--alc-bg); }
-  .ccard.co2::before { background:var(--co2); } .ccard.co2 { background:var(--co2-bg); }
-  .ccard.env::before { background:linear-gradient(90deg,var(--tmp),var(--rh)); } .ccard.env { background:#F9F5FF; }
+  .ccard.co::before  {background:var(--co);}  .ccard.co  {background:var(--co-bg);}
+  .ccard.h2::before  {background:var(--h2);}  .ccard.h2  {background:var(--h2-bg);}
+  .ccard.alc::before {background:var(--alc);} .ccard.alc {background:var(--alc-bg);}
+  .ccard.co2::before {background:var(--co2);} .ccard.co2 {background:var(--co2-bg);}
+  .ccard.env::before {background:linear-gradient(90deg,var(--tmp),var(--rh));} .ccard.env {background:#F9F5FF;}
 
   .ctitle { font-size:12px; font-weight:700; margin-bottom:2px; }
   .csub   { font-size:10px; color:var(--muted); margin-bottom:12px; }
-
   .legrow  { display:flex; gap:14px; margin-bottom:10px; }
   .legitem { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--muted); }
   .legsw   { width:18px; height:3px; border-radius:2px; flex-shrink:0; }
@@ -105,28 +82,16 @@
   .aloge { display:flex; align-items:center; gap:10px; padding:10px 18px; border-bottom:1px solid var(--border); font-size:12px; }
   .aloge:last-child { border-bottom:none; }
   .adot  { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-  .adot.danger  { background:var(--danger); }
-  .adot.warning { background:var(--warn); }
-  .adot.safe    { background:var(--safe); }
+  .adot.danger  {background:var(--danger);}
+  .adot.warning {background:var(--warn);}
+  .adot.safe    {background:var(--safe);}
   .atime  { color:var(--muted); min-width:72px; font-size:11px; }
   .asname { font-weight:700; }
-  .asname.co  { color:var(--co); }
-  .asname.h2  { color:#4A9AE8; }
-  .asname.alc { color:#E0904A; }
-  .asname.co2 { color:#3AAA70; }
-  .asname.sys { color:var(--muted); }
-
-  .cfgsec { background:var(--surface2); border:1.5px solid rgba(255,200,0,0.2); border-radius:var(--radius); padding:20px; margin-top:20px; }
-  .cfgtit { font-size:13px; font-weight:700; margin-bottom:14px; color:var(--text); }
-  .cfginp { width:100%; background:var(--surface); border:1.5px solid var(--border); border-radius:10px; padding:10px 14px; color:var(--text); font-family:monospace; font-size:12px; margin-bottom:10px; }
-  .cfginp:focus { outline:none; border-color:var(--h2); }
-  .cbtn  { background:var(--h2); color:#fff; border:none; border-radius:10px; padding:9px 18px; font-size:13px; font-weight:700; cursor:pointer; transition:opacity .2s; }
-  .cbtn:hover { opacity:.85; }
-  .cbtn.demo { background:var(--surface); border:1.5px solid var(--border); color:var(--muted); margin-left:8px; font-weight:600; }
-  .chint { font-size:11px; color:var(--muted); margin-top:10px; line-height:1.65; }
+  .asname.co  {color:#E07080;} .asname.h2  {color:#4A9AE8;}
+  .asname.alc {color:#E0904A;} .asname.co2 {color:#3AAA70;} .asname.sys {color:var(--muted);}
 
   .footer { text-align:center; padding:20px; font-size:11px; color:var(--muted); border-top:1.5px solid var(--border); margin-top:8px; background:var(--surface); }
-  @media(max-width:800px){ main{padding:16px;} header{padding:12px 16px;} .banner{margin:16px 16px 0;} }
+  @media(max-width:800px){main{padding:16px;} header{padding:12px 16px;}}
 </style>
 </head>
 <body>
@@ -136,31 +101,17 @@
     <div class="logo">🧪</div>
     <div class="htitle">
       <h1>Sistem Pemantauan Gas Multi-Parameter</h1>
-      <p>Laboratorium Fisika Kimia — Universitas Indonesia</p>
+      <p>Laboratorium Fisika — Universitas Indonesia</p>
     </div>
   </div>
   <div class="hr">
-    <div class="pill" id="pill"><div class="dot" id="dot"></div><span id="sysStatus">Sistem Aktif</span></div>
+    <div class="pill" id="pill"><div class="dot" id="dot"></div><span id="sysStatus">Memuat...</span></div>
     <div class="lupd">Update: <span id="lupd">—</span></div>
   </div>
 </header>
 
-<div class="banner">
-  <span style="font-size:20px;flex-shrink:0;margin-top:1px">⚙️</span>
-  <div><strong>Setup:</strong> Publish Google Sheets kamu sebagai CSV (<strong>File → Share → Publish to web → CSV</strong>), salin URL-nya, tempel di bawah.
-  Kolom: <code>Timestamp</code> <code>CO_ppm</code> <code>H2_ppm</code> <code>Alcohol_ppm</code> <code>CO2_ppm</code> <code>Suhu_C</code> <code>RH_pct</code></div>
-</div>
-
 <main>
-  <div class="cfgsec">
-    <div class="cfgtit">🔗 Hubungkan ke Google Sheets</div>
-    <input class="cfginp" id="sheetUrl" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv" value="https://docs.google.com/spreadsheets/d/e/2PACX-1vQUYcTulizx2xLrTSF_wlRz360vgH6Q-fToFesfdey3giw0PQl9pCtmBowk3--bhoaecqUW1UcMyvJC/pub?gid=0&single=true&output=csv"/>
-    <button class="cbtn" onclick="connectSheet()">Hubungkan</button>
-    <button class="cbtn demo" onclick="loadDemo()">Coba Data Demo</button>
-    <p class="chint">Data diperbarui otomatis setiap 10 detik. URL Google Sheets sudah diisi otomatis dari spreadsheet kamu.</p>
-  </div>
-
-  <div style="margin-top:28px">
+  <div style="margin-bottom:28px">
     <div class="slabel">Pembacaan Sensor — Real-time</div>
     <div class="sgrid">
       <div class="scard co" id="card-co">
@@ -212,7 +163,7 @@
     <div class="slabel">Grafik Historis — 30 Data Terakhir</div>
     <div class="crow4">
       <div class="ccard co">
-        <div class="ctitle" style="color:var(--co)">Karbon Monoksida (CO)</div>
+        <div class="ctitle" style="color:#E07080">Karbon Monoksida (CO)</div>
         <div class="csub">MQ-7 · Batas 50 ppm</div>
         <div style="position:relative;height:160px"><canvas id="ch-co" role="img" aria-label="Grafik CO">Memuat...</canvas></div>
       </div>
@@ -237,8 +188,8 @@
         <div class="ctitle" style="color:#7A50CC">Suhu &amp; Kelembapan — DHT22</div>
         <div class="csub">Parameter lingkungan untuk kompensasi sensor</div>
         <div class="legrow">
-          <div class="legitem"><div class="legsw" style="background:#C89FFF"></div><span>Suhu (°C) — sumbu kiri</span></div>
-          <div class="legitem"><div class="legsw" style="background:none;border-top:2px dashed #5FD4E8"></div><span>Kelembapan (%RH) — sumbu kanan</span></div>
+          <div class="legitem"><div class="legsw" style="background:#C89FFF"></div>Suhu (°C) — sumbu kiri</div>
+          <div class="legitem"><div class="legsw" style="background:none;border-top:2px dashed #5FD4E8"></div>Kelembapan (%RH) — sumbu kanan</div>
         </div>
         <div style="position:relative;height:190px"><canvas id="ch-env" role="img" aria-label="Grafik Suhu dan Kelembapan">Memuat...</canvas></div>
       </div>
@@ -250,7 +201,7 @@
     <div class="alog">
       <div class="alogh">🔔 Riwayat Alarm &amp; Status</div>
       <div id="alogBody">
-        <div class="aloge"><div class="adot safe"></div><span class="atime">—</span><span style="color:var(--muted)">Menunggu koneksi data...</span></div>
+        <div class="aloge"><div class="adot safe"></div><span class="atime">—</span><span style="color:var(--muted)">Memuat data dari sensor...</span></div>
       </div>
     </div>
   </div>
@@ -259,9 +210,10 @@
 <div class="footer">Sistem Pemantauan Gas Berbasis IoT · Departemen Fisika FMIPA UI · 2026</div>
 
 <script>
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQUYcTulizx2xLrTSF_wlRz360vgH6Q-fToFesfdey3giw0PQl9pCtmBowk3--bhoaecqUW1UcMyvJC/pub?gid=0&single=true&output=csv";
 const THR={co:50,h2:1000,alc:1000,co2:1000,temp:40,rh:80};
 const W=0.7;
-let charts={},sheetUrl='',ivl=null,log=[],prev={};
+let charts={},log=[],prev={};
 
 const mkChart=(id,color,fill,dash,ymax)=>new Chart(document.getElementById(id),{
   type:'line',
@@ -270,8 +222,8 @@ const mkChart=(id,color,fill,dash,ymax)=>new Chart(document.getElementById(id),{
     responsive:true,maintainAspectRatio:false,animation:{duration:350},
     plugins:{legend:{display:false},tooltip:{backgroundColor:'#fff',borderColor:color,borderWidth:1.5,titleColor:'#888',bodyColor:color,padding:10,cornerRadius:8}},
     scales:{
-      x:{ticks:{color:'#bbb',font:{size:9},maxTicksLimit:5,autoSkip:true},grid:{color:'rgba(0,0,0,0.04)'}},
-      y:{ticks:{color:'#bbb',font:{size:9}},grid:{color:'rgba(0,0,0,0.06)'},...(ymax?{max:ymax}:{})}
+      x:{ticks:{color:'#ccc',font:{size:9},maxTicksLimit:5,autoSkip:true},grid:{color:'rgba(0,0,0,0.04)'}},
+      y:{ticks:{color:'#ccc',font:{size:9}},grid:{color:'rgba(0,0,0,0.05)'},...(ymax?{max:ymax}:{})}
     }
   }
 });
@@ -291,7 +243,7 @@ function initCharts(){
       responsive:true,maintainAspectRatio:false,animation:{duration:350},
       plugins:{legend:{display:true,labels:{color:'#888',font:{size:11},boxWidth:16,padding:16}},tooltip:{backgroundColor:'#fff',borderColor:'rgba(0,0,0,.1)',borderWidth:1,titleColor:'#888',bodyColor:'#444',padding:10,cornerRadius:8}},
       scales:{
-        x:{ticks:{color:'#bbb',font:{size:9},maxTicksLimit:8,autoSkip:true},grid:{color:'rgba(0,0,0,0.04)'}},
+        x:{ticks:{color:'#ccc',font:{size:9},maxTicksLimit:8,autoSkip:true},grid:{color:'rgba(0,0,0,0.04)'}},
         y1:{position:'left', ticks:{color:'#C89FFF',font:{size:9}},grid:{color:'rgba(0,0,0,.04)'},title:{display:true,text:'°C',color:'#C89FFF',font:{size:10}}},
         y2:{position:'right',ticks:{color:'#5FD4E8',font:{size:9}},grid:{drawOnChartArea:false},title:{display:true,text:'%RH',color:'#5FD4E8',font:{size:10}}}
       }
@@ -300,9 +252,7 @@ function initCharts(){
 }
 
 function updCard(id,val,thr,baseClass){
-  const pct=Math.min((val/thr)*100,100);
-  const isA=val>=thr,isW=!isA&&val>=thr*W;
-  const st=isA?'alarm':isW?'warning':'safe';
+  const pct=Math.min((val/thr)*100,100),isA=val>=thr,isW=!isA&&val>=thr*W;
   document.getElementById('val-'+id).textContent=isNaN(val)?'—':val.toFixed(1);
   const bar=document.getElementById('bar-'+id);
   bar.style.width=pct+'%';
@@ -313,7 +263,7 @@ function updCard(id,val,thr,baseClass){
   const badge=document.getElementById('badge-'+id);
   badge.className='sbadge'+(isA?' alarm':isW?' warning':'');
   badge.textContent=isA?'ALARM!':isW?'WASPADA':'AMAN';
-  return st;
+  return isA?'alarm':isW?'warning':'safe';
 }
 
 function addLog(time,type,sensor,msg,cls){
@@ -348,11 +298,14 @@ function processRows(rows){
   });
   const labels=data.map(r=>{const t=r[ix('Timestamp')]||'';return t.length>8?t.slice(-8):t;});
   const col=k=>data.map(r=>parseFloat(r[ix(k)])||0);
-  charts.co.data.labels=labels;  charts.co.data.datasets[0].data=col('CO_ppm');      charts.co.update();
-  charts.h2.data.labels=labels;  charts.h2.data.datasets[0].data=col('H2_ppm');      charts.h2.update();
-  charts.alc.data.labels=labels; charts.alc.data.datasets[0].data=col('Alcohol_ppm');charts.alc.update();
-  charts.co2.data.labels=labels; charts.co2.data.datasets[0].data=col('CO2_ppm');    charts.co2.update();
-  charts.env.data.labels=labels; charts.env.data.datasets[0].data=col('Suhu_C'); charts.env.data.datasets[1].data=col('RH_pct'); charts.env.update();
+  charts.co.data.labels=labels;  charts.co.data.datasets[0].data=col('CO_ppm');       charts.co.update();
+  charts.h2.data.labels=labels;  charts.h2.data.datasets[0].data=col('H2_ppm');       charts.h2.update();
+  charts.alc.data.labels=labels; charts.alc.data.datasets[0].data=col('Alcohol_ppm'); charts.alc.update();
+  charts.co2.data.labels=labels; charts.co2.data.datasets[0].data=col('CO2_ppm');     charts.co2.update();
+  charts.env.data.labels=labels;
+  charts.env.data.datasets[0].data=col('Suhu_C');
+  charts.env.data.datasets[1].data=col('RH_pct');
+  charts.env.update();
   document.getElementById('lupd').textContent=now;
   const anyA=Object.values(states).includes('alarm'),anyW=Object.values(states).includes('warning');
   const pill=document.getElementById('pill'),dot=document.getElementById('dot'),txt=document.getElementById('sysStatus');
@@ -370,32 +323,13 @@ function parseCSV(txt){
 }
 
 async function fetchSheet(){
-  if(!sheetUrl)return;
-  try{const res=await fetch(sheetUrl+'&t='+Date.now());processRows(parseCSV(await res.text()));}
+  try{const res=await fetch(SHEET_URL+'&t='+Date.now());processRows(parseCSV(await res.text()));}
   catch(e){document.getElementById('sysStatus').textContent='Gagal Terhubung';}
 }
 
-function connectSheet(){
-  sheetUrl=document.getElementById('sheetUrl').value.trim();
-  if(!sheetUrl){alert('Masukkan URL Google Sheets!');return;}
-  if(ivl)clearInterval(ivl);
-  fetchSheet();
-  ivl=setInterval(fetchSheet,10000);
-  addLog(new Date().toLocaleTimeString('id-ID'),'safe','Sistem','Dashboard terhubung ke Google Sheets.','sys');
-}
-
-function loadDemo(){
-  const now=new Date(),rows=[['Timestamp','CO_ppm','H2_ppm','Alcohol_ppm','CO2_ppm','Suhu_C','RH_pct']];
-  for(let i=29;i>=0;i--){
-    const t=new Date(now-i*10000);
-    rows.push([t.toLocaleTimeString('id-ID'),(15+Math.random()*20).toFixed(1),(200+Math.random()*300).toFixed(1),(150+Math.random()*200).toFixed(1),(600+Math.random()*280).toFixed(1),(27+Math.random()*3).toFixed(1),(55+Math.random()*15).toFixed(1)]);
-  }
-  rows.push([new Date().toLocaleTimeString('id-ID'),'52','850','720','980','38','78']);
-  processRows(rows);
-  addLog(new Date().toLocaleTimeString('id-ID'),'safe','Sistem','Mode demo aktif.','sys');
-}
-
 initCharts();
+fetchSheet();
+setInterval(fetchSheet,10000);
 </script>
 </body>
 </html>
